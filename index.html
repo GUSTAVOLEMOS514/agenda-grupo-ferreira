@@ -1,0 +1,454 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Agenda - GRUPO FERREIRA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+  <style>
+    body {
+      background: url('fundo_agenda.jpg') no-repeat center center fixed;
+      background-size: cover;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f6f9;
+    }
+    header {
+      background-color: #2d3436;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: bold;
+    }
+    main {
+      max-width: 1100px;
+      margin: 30px auto;
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+    h2 {
+      margin-top: 40px;
+      color: #2d3436;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 5px;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 15px;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .btn-green { background-color: #27ae60; color: white; }
+    .btn-blue { background-color: #2980b9; color: white; }
+    .btn-gray { background-color: #636e72; color: white; }
+    .btn-whatsapp { background-color: #25D366; color: white; }
+    .controls-top {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+      align-items: center;
+    }
+    .controls-top input, .controls-top select {
+      flex: 1;
+      min-width: 200px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background-color: #ecf0f1;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+    .actions button {
+      margin-right: 5px;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: flex-start;
+      padding-top: 60px;
+      z-index: 999;
+      align-items: flex-start;
+      padding-top: 40px;
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+    .modal-content {
+      background: white;
+      padding: 40px 30px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      max-height: 90vh;
+      overflow-y: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 500px;
+      position: relative;
+    }
+    .modal-content span {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      font-size: 18px;
+      background: #ffdddd;
+      color: #900;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      text-align: center;
+      line-height: 30px;
+      font-weight: bold;
+      box-shadow: 0 0 5px rgba(0,0,0,0.2);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .modal-content span:hover {
+      background: #ffcccc;
+    }
+      background: #eee;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      text-align: center;
+      line-height: 30px;
+      font-weight: bold;
+      z-index: 1000;
+    
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+    #statusMsg {
+      color: green;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    @media (max-width: 600px) {
+      .controls-top {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginOverlay" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9999; display: flex; align-items: center; justify-content: center;">
+  <div id="loginBox" style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.3); text-align: center; max-width: 300px; width: 90%;">
+    <h2>🔐 Acesso à Agenda</h2>
+    <input type="password" id="senha" placeholder="Digite a senha..." style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px;">
+    <button onclick="verificaSenha()" style="background-color: #27ae60; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Entrar</button>
+    <p id="erro" style="color: tomato; margin-top: 10px;"></p>
+    <div style="margin-top:15px; font-size:12px;">
+      <a href="https://wa.me/5581979149940" target="_blank" style="color:#27ae60; text-decoration:none;">
+        Criado por Gustavo Lemos • GL SOLUÇÕES - (81) 97914-9940
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+function verificaSenha() {
+  const senhaDigitada = document.getElementById("senha").value;
+  const senhaCorreta = "ferreira2025";
+  if (senhaDigitada === senhaCorreta) {
+    document.getElementById("loginOverlay").style.display = "none";
+  } else {
+    document.getElementById("erro").innerText = "Senha incorreta!";
+  }
+}
+</script>
+
+
+<header>📞 Agenda Telefônica - GRUPO FERREIRA</header>
+
+<main>
+  <div class="controls-top">
+    <input type="text" id="busca" placeholder="🔍 Buscar por nome, empresa ou telefone" oninput="listarContatos()">
+    <select id="filtroTipo" onchange="listarContatos()">
+      <option value="">Todos os Tipos</option>
+      <option value="Vendedor">Vendedor</option>
+      <option value="Fornecedor">Fornecedor</option>
+    </select>
+    <button class="btn-blue" onclick="exportarCSV()">Exportar Excel</button>
+    <button class="btn-blue" onclick="exportarPDF()">Exportar PDF</button>
+    <button class="btn-green" onclick="abrirCadastro()">+ Novo Contato</button>
+  </div>
+
+  <div style="overflow-x:auto">
+    <table id="tabela">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Empresa</th>
+          <th>Telefone</th>
+          <th>Tipo</th>
+          <th>Observação</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody><tr><td colspan="6">🔍 Digite para buscar ou cadastre um novo contato</td></tr></tbody>
+    </table>
+  </div>
+
+  <div id="statusMsg"></div>
+</main>
+
+<!-- Modal de Cadastro -->
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <span onclick="fecharCadastro()">❌</span>
+    <h2>Cadastro de Contato</h2>
+    <input type="hidden" id="editIndex" value="-1">
+
+    <label>Nome *</label>
+    <input type="text" id="nome">
+
+    <label>Empresa *</label>
+    <input type="text" id="empresa">
+
+    <label>Telefone *</label>
+    <input type="text" id="telefone">
+
+    <label>Tipo *</label>
+    <select id="tipo">
+      <option value="">-- Selecione --</option>
+      <option value="Vendedor">Vendedor</option>
+      <option value="Fornecedor">Fornecedor</option>
+    </select>
+
+    <label>Observação</label>
+    <textarea id="obs" rows="3"></textarea>
+
+    <button class="btn-green" onclick="salvarContato()">Salvar e Fechar</button>
+  </div>
+</div>
+
+<script>
+  const tabela = document.querySelector("#tabela tbody");
+
+  function abrirCadastro() {
+    document.getElementById("modal").style.display = "flex";
+  }
+
+  function fecharCadastro() {
+    document.getElementById("modal").style.display = "none";
+    limparCampos();
+  }
+
+  function salvarContato() {
+    const nome = document.getElementById("nome").value.trim();
+    const empresa = document.getElementById("empresa").value.trim();
+    const telefone = document.getElementById("telefone").value.trim();
+    const tipo = document.getElementById("tipo").value;
+    const obs = document.getElementById("obs").value.trim();
+    const indexEditando = parseInt(document.getElementById("editIndex").value);
+
+    if (!nome || !empresa || !telefone || !tipo) {
+      alert("Preencha todos os campos obrigatórios.");
+      return;
+    }
+
+    const contato = { nome, empresa, telefone, tipo, obs };
+    let contatos = JSON.parse(localStorage.getItem("contatos")) || [];
+
+    if (indexEditando >= 0) {
+      contatos[indexEditando] = contato;
+      mostrarMsg("Contato atualizado com sucesso!");
+    } else {
+      contatos.push(contato);
+      mostrarMsg("Contato salvo com sucesso!");
+    }
+
+    localStorage.setItem("contatos", JSON.stringify(contatos));
+    fecharCadastro();
+    listarContatos();
+
+  function excluirContato(index) {
+    if (confirm("Tem certeza que deseja excluir este contato?")) {
+      let contatos = JSON.parse(localStorage.getItem("contatos")) || [];
+      contatos.splice(index, 1);
+      localStorage.setItem("contatos", JSON.stringify(contatos));
+      listarContatos();
+      mostrarMsg("Contato excluído com sucesso!");
+    }
+  }
+  }
+
+  function mostrarMsg(msg) {
+    const div = document.getElementById("statusMsg");
+    div.innerText = msg;
+    setTimeout(() => div.innerText = "", 3000);
+  }
+
+  function limparCampos() {
+    document.getElementById("nome").value = "";
+    document.getElementById("empresa").value = "";
+    document.getElementById("telefone").value = "";
+    document.getElementById("tipo").value = "";
+    document.getElementById("obs").value = "";
+    document.getElementById("editIndex").value = -1;
+  }
+
+  function listarContatos() {
+    const busca = document.getElementById("busca").value.toLowerCase();
+    const filtroTipo = document.getElementById("filtroTipo").value;
+    tabela.innerHTML = "";
+    if (!busca && !filtroTipo) return;
+
+    let contatos = JSON.parse(localStorage.getItem("contatos")) || [];
+
+    contatos.forEach((c, index) => {
+      if (
+        (!filtroTipo || c.tipo === filtroTipo) &&
+        (
+          c.nome.toLowerCase().includes(busca) ||
+          c.empresa.toLowerCase().includes(busca) ||
+          c.telefone.includes(busca)
+        )
+      ) {
+        const row = tabela.insertRow();
+        row.insertCell().innerText = c.nome;
+        row.insertCell().innerText = c.empresa;
+        row.insertCell().innerText = c.telefone;
+        row.insertCell().innerText = c.tipo;
+        row.insertCell().innerText = c.obs;
+
+        const acoes = document.createElement("div");
+        acoes.className = "actions";
+
+        const btnWhats = document.createElement("button");
+        btnWhats.innerText = "📲 WhatsApp";
+        btnWhats.className = "btn-whatsapp";
+        btnWhats.onclick = () => {
+          const numero = c.telefone.replace(/\D/g, "");
+          window.open(`https://wa.me/55${numero}`, "_blank");
+        };
+        acoes.appendChild(btnWhats);
+
+        const btnEdit = document.createElement("button");
+        btnEdit.innerText = "✏️ Editar";
+        btnEdit.className = "btn-gray";
+        btnEdit.onclick = () => editarContato(index);
+        const btnDel = document.createElement("button");
+        btnDel.innerText = "🗑️ Excluir";
+        btnDel.className = "btn-gray";
+        btnDel.onclick = () => excluirContato(index);
+        acoes.appendChild(btnDel);
+        acoes.appendChild(btnEdit);
+
+        const cell = row.insertCell();
+        cell.appendChild(acoes);
+      }
+    });
+  }
+
+  function editarContato(index) {
+    const contatos = JSON.parse(localStorage.getItem("contatos")) || [];
+    const c = contatos[index];
+    document.getElementById("nome").value = c.nome;
+    document.getElementById("empresa").value = c.empresa;
+    document.getElementById("telefone").value = c.telefone;
+    document.getElementById("tipo").value = c.tipo;
+    document.getElementById("obs").value = c.obs;
+    document.getElementById("editIndex").value = index;
+    abrirCadastro();
+  }
+
+  function exportarCSV() {
+    let contatos = JSON.parse(localStorage.getItem("contatos")) || [];
+    if (contatos.length === 0) {
+      alert("Nenhum contato para exportar.");
+      return;
+    }
+
+    let csv = "Nome,Empresa,Telefone,Tipo,Observação\n";
+    contatos.forEach(c => {
+      csv += `"${c.nome}","${c.empresa}","${c.telefone}","${c.tipo}","${c.obs}"\n`;
+    });
+
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "agenda_ferreira.csv";
+    a.click();
+  }
+
+  function exportarPDF() {
+    const container = document.getElementById("tabela");
+    html2pdf().from(container).set({
+      margin: 0.5,
+      filename: "agenda_ferreira.pdf",
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: "in", format: "a4", orientation: "landscape" }
+    }).save();
+  }
+
+  listarContatos();
+
+  function excluirContato(index) {
+    if (confirm("Tem certeza que deseja excluir este contato?")) {
+      let contatos = JSON.parse(localStorage.getItem("contatos")) || [];
+      contatos.splice(index, 1);
+      localStorage.setItem("contatos", JSON.stringify(contatos));
+      listarContatos();
+      mostrarMsg("Contato excluído com sucesso!");
+    }
+  }
+</script>
+
+
+
+</body>
+</html>
